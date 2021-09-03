@@ -1,0 +1,25 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+sub read_file {
+    my $file = $_[0];
+    open(FH, '<', $file) or die $!;
+    my $line = <FH>;
+    close(FH);
+    $line =~ s/\\n//g;
+    return $line;
+}
+
+sub get_info {
+    my $hostname = read_file '/etc/hostname';
+    my $kernel   = read_file '/proc/sys/kernel/osrelease';
+    return (
+	    hostname => $hostname, 
+	    "kernel" => $kernel,
+    );
+}
+
+my %info = get_info;
+
+print "hostname = $info{hostname}kernel   = $info{kernel}";
