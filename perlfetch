@@ -7,7 +7,7 @@ sub read_file {
     open(FH, '<', $file) or die $!;
     my $line = <FH>;
     close(FH);
-    $line =~ s/\\n//g;
+    $line =~ s/\n//g;
     return $line;
 }
 
@@ -22,4 +22,4 @@ sub get_info {
 
 my %info = get_info;
 
-print "hostname = $info{hostname}kernel   = $info{kernel}";
+print "hostname = $info{hostname}\nkernel   = $info{kernel}\n";
