@@ -1,0 +1,8 @@
+### perlfetch ###
+
+Current output:
+```
+$ ./perlfetch
+hostname = void
+kernel   = 5.13.13_1
+```
