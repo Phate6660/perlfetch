@@ -16,7 +16,7 @@ sub get_info {
     my $kernel   = read_file '/proc/sys/kernel/osrelease';
     return (
 	    hostname => $hostname, 
-	    "kernel" => $kernel,
+	    kernel => $kernel,
     );
 }
 
