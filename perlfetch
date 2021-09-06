@@ -5,7 +5,7 @@ use warnings;
 sub get_line {
     my $file = $_[0];
     my $line_number = $_[1];
-    open my $info, $file or die "Could not open $file: $!";
+    open my $info, $file or return "N/A (could not open $file)";
     my $line;
     while (my $line_from_file = <$info>) {
         $line = $line_from_file;
