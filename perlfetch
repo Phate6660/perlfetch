@@ -2,24 +2,39 @@
 use strict;
 use warnings;
 
-sub read_file {
+# Read a file and return a specified line.
+sub get_line {
     my $file = $_[0];
-    open(FH, '<', $file) or die $!;
-    my $line = <FH>;
-    close(FH);
+    my $line_number = $_[1];
+    open my $info, $file or die "Could not open $file: $!";
+    my $line;
+    while (my $line_from_file = <$info>) {
+        $line = $line_from_file;
+	last if $. == $line_number;
+    }
+    close $info;
     $line =~ s/\n//g;
     return $line;
 }
 
+sub get_distro {
+    my $dist_line = get_line('/etc/os-release', 3);
+    my @dist_list = split(/=/, $dist_line);
+    my $dist = $dist_list[1];
+    $dist =~ s/"//g;
+    return $dist;
+}
+
 sub get_info {
-    my $hostname = read_file '/etc/hostname';
-    my $kernel   = read_file '/proc/sys/kernel/osrelease';
+    my $distro   = get_distro;
+    my $hostname = get_line('/etc/hostname', 1);
+    my $kernel   = get_line('/proc/sys/kernel/osrelease', 1);
     return (
+            distro   => $distro,
 	    hostname => $hostname, 
-	    kernel => $kernel,
+	    kernel   => $kernel,
     );
 }
 
 my %info = get_info;
-
-print "hostname = $info{hostname}\nkernel   = $info{kernel}\n";
+print "distro   = $info{distro}\nhostname = $info{hostname}\nkernel   = $info{kernel}\n";

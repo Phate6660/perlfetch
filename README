@@ -2,5 +2,6 @@
 
 Current output:
 $ ./perlfetch
-hostname = void
-kernel   = 5.13.13_1
+distro   = Gentoo/Linux
+hostname = gentoo
+kernel   = 5.10.61-gentoo-dist
