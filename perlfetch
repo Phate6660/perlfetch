@@ -10,7 +10,7 @@ sub get_line {
     my $line;
     while (my $line_from_file = <$info>) {
         $line = $line_from_file;
-	last if $. == $line_number;
+        last if $. == $line_number;
     }
     close $info;
     $line =~ s/\n//g;
@@ -30,9 +30,9 @@ sub get_info {
     my $hostname = get_line('/etc/hostname', 1);
     my $kernel   = get_line('/proc/sys/kernel/osrelease', 1);
     return (
-            distro   => $distro,
-	    hostname => $hostname, 
-	    kernel   => $kernel,
+        distro   => $distro,
+        hostname => $hostname, 
+        kernel   => $kernel,
     );
 }
 
