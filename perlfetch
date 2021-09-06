@@ -1,5 +1,4 @@
 #!/usr/bin/env perl
-use strict;
 use warnings;
 
 # Read a file and return a specified line.
@@ -15,6 +14,17 @@ sub get_line {
     close $info;
     $line =~ s/\n//g;
     return $line;
+}
+
+sub get_var {
+    my $env_var = $_[0];
+    my $contents;
+    if ($ENV{$env_var}) {
+        $contents = $ENV{$env_var};
+    } else {
+        $contents = "N/A (could not read '\$$env_var')";
+    }
+    return $contents;
 }
 
 sub get_cpu {
@@ -36,15 +46,40 @@ sub get_distro {
 sub get_info {
     my $cpu      = get_cpu;
     my $distro   = get_distro;
+    my $editor   = get_var 'EDITOR';
     my $hostname = get_line('/etc/hostname', 1);
     my $kernel   = get_line('/proc/sys/kernel/osrelease', 1);
+    my $shell    = get_var 'SHELL';
+    my $user     = get_var 'USER';
     return (
         cpu      => $cpu,
         distro   => $distro,
+        editor   => $editor,
         hostname => $hostname,
         kernel   => $kernel,
+        shell    => $shell,
+        user     => $user,
     );
 }
 
 my %info = get_info;
-print "cpu      = $info{cpu}\ndistro   = $info{distro}\nhostname = $info{hostname}\nkernel   = $info{kernel}\n";
+format OUTPUT =
+^*
+"CPU      = " . $info{cpu}
+^*
+"DISTRO   = " . $info{distro}
+^*
+"EDITOR   = " . $info{editor}
+^*
+"HOSTNAME = " . $info{hostname}
+^*
+"KERNEL   = " . $info{kernel}
+^*
+"SHELL    = " . $info{shell}
+^*
+"USER     = " . $info{user}
+.
+
+select(STDOUT);
+$~ = OUTPUT;
+write;
