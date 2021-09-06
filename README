@@ -2,10 +2,11 @@
 
 Current output:
 $ ./perlfetch
-CPU      = Intel(R) Core(TM) i5-3470 CPU @ 3.20GHz
-DISTRO   = Gentoo/Linux
-EDITOR   = /usr/bin/nvim
-HOSTNAME = gentoo
-KERNEL   = 5.10.61-gentoo-dist
-SHELL    = /bin/bash
-USER     = valley
+CPU         = Intel(R) Core(TM) i5-3470 CPU @ 3.20GHz
+DISTRO      = Gentoo/Linux
+EDITOR      = /usr/bin/nvim
+ENVIRONMENT = GNOME
+HOSTNAME    = gentoo
+KERNEL      = 5.10.61-gentoo-dist
+SHELL       = /bin/bash
+USER        = valley

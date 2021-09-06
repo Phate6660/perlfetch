@@ -18,11 +18,12 @@ sub get_line {
 
 sub get_var {
     my $env_var = $_[0];
+    my $na_message = $_[1];
     my $contents;
     if ($ENV{$env_var}) {
         $contents = $ENV{$env_var};
     } else {
-        $contents = "N/A (could not read '\$$env_var')";
+        $contents = $na_message;
     }
     return $contents;
 }
@@ -43,41 +44,64 @@ sub get_distro {
     return $dist;
 }
 
+sub get_de {
+    my $XDG_DESKTOP_SESSION = get_var('XDG_DESKTOP_SESSION', "N/A");
+    if ($XDG_DESKTOP_SESSION eq "N/A") {
+        my $XDG_CURRENT_DESKTOP = get_var('XDG_CURRENT_DESKTOP', "N/A");
+        if ($XDG_CURRENT_DESKTOP eq "N/A") {
+            my $DESKTOP_SESSION = get_var('DESKTOP_SESSION', "N/A");
+            if ($DESKTOP_SESSION eq "N/A") {
+                return "N/A (could not find a desktop environment | TODO: find WM)";
+            } else {
+                return $DESKTOP_SESSION;
+            }
+        } else {
+            return $XDG_CURRENT_DESKTOP;
+        }
+    } else {
+        return $XDG_DESKTOP_SESSION;
+    }
+}
+
 sub get_info {
-    my $cpu      = get_cpu;
-    my $distro   = get_distro;
-    my $editor   = get_var 'EDITOR';
-    my $hostname = get_line('/etc/hostname', 1);
-    my $kernel   = get_line('/proc/sys/kernel/osrelease', 1);
-    my $shell    = get_var 'SHELL';
-    my $user     = get_var 'USER';
+    my $cpu         = get_cpu;
+    my $distro      = get_distro;
+    my $editor      = get_var('EDITOR', "N/A (could not read \$EDITOR)");
+    my $environment = get_de;
+    my $hostname    = get_line('/etc/hostname', 1);
+    my $kernel      = get_line('/proc/sys/kernel/osrelease', 1);
+    my $shell       = get_var('SHELL', "N/A (could not read \$SHELL)");
+    my $user        = get_var('USER', "N/A (could not read \$USER)");
     return (
-        cpu      => $cpu,
-        distro   => $distro,
-        editor   => $editor,
-        hostname => $hostname,
-        kernel   => $kernel,
-        shell    => $shell,
-        user     => $user,
+        cpu         => $cpu,
+        distro      => $distro,
+        editor      => $editor,
+        environment => $environment,
+        hostname    => $hostname,
+        kernel      => $kernel,
+        shell       => $shell,
+        user        => $user,
     );
 }
 
 my %info = get_info;
 format OUTPUT =
 ^*
-"CPU      = " . $info{cpu}
+"CPU         = " . $info{cpu}
 ^*
-"DISTRO   = " . $info{distro}
+"DISTRO      = " . $info{distro}
 ^*
-"EDITOR   = " . $info{editor}
+"EDITOR      = " . $info{editor}
 ^*
-"HOSTNAME = " . $info{hostname}
+"ENVIRONMENT = " . $info{environment}
 ^*
-"KERNEL   = " . $info{kernel}
+"HOSTNAME    = " . $info{hostname}
 ^*
-"SHELL    = " . $info{shell}
+"KERNEL      = " . $info{kernel}
 ^*
-"USER     = " . $info{user}
+"SHELL       = " . $info{shell}
+^*
+"USER        = " . $info{user}
 .
 
 select(STDOUT);
