@@ -17,6 +17,14 @@ sub get_line {
     return $line;
 }
 
+sub get_cpu {
+    my $cpu_line = get_line('/proc/cpuinfo', 5);
+    my @cpu_list = split(/:/, $cpu_line);
+    my $cpu = $cpu_list[1];
+    $cpu =~ s/^.//;
+    return $cpu;
+}
+
 sub get_distro {
     my $dist_line = get_line('/etc/os-release', 3);
     my @dist_list = split(/=/, $dist_line);
@@ -26,15 +34,17 @@ sub get_distro {
 }
 
 sub get_info {
+    my $cpu      = get_cpu;
     my $distro   = get_distro;
     my $hostname = get_line('/etc/hostname', 1);
     my $kernel   = get_line('/proc/sys/kernel/osrelease', 1);
     return (
+        cpu      => $cpu,
         distro   => $distro,
-        hostname => $hostname, 
+        hostname => $hostname,
         kernel   => $kernel,
     );
 }
 
 my %info = get_info;
-print "distro   = $info{distro}\nhostname = $info{hostname}\nkernel   = $info{kernel}\n";
+print "cpu      = $info{cpu}\ndistro   = $info{distro}\nhostname = $info{hostname}\nkernel   = $info{kernel}\n";
