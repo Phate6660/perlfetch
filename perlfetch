@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 use warnings;
+use strict;
 
 # Read a file and return a specified line.
 sub get_line {
@@ -157,29 +158,16 @@ sub get_info {
 }
 
 my %info = get_info;
-format OUTPUT =
-^*
-"CPU         = " . $info{cpu}
-^*
-"DISTRO      = " . $info{distro}
-^*
-"EDITOR      = " . $info{editor}
-^*
-"ENVIRONMENT = " . $info{environment}
-^*
-"HOSTNAME    = " . $info{hostname}
-^*
-"KERNEL      = " . $info{kernel}
-^*
-"PACKAGES    = " . $info{packages}
-^*
-"SHELL       = " . $info{shell}
-^*
-"UPTIME      = " . $info{uptime}
-^*
-"USER        = " . $info{user}
-.
 
-select(STDOUT);
-$~ = OUTPUT;
-write;
+print << "EOF"
+CPU         = $info{cpu}
+DISTRO      = $info{distro}
+EDITOR      = $info{editor}
+ENVIRONMENT = $info{environment}
+HOSTNAME    = $info{hostname}
+KERNEL      = $info{kernel}
+PACKAGES    = $info{packages}
+SHELL       = $info{shell}
+UPTIME      = $info{uptime}
+USER        = $info{user}
+EOF
