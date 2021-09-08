@@ -90,9 +90,9 @@ sub get_info {
     my $package_manager = $ARGV[0];
     my $packages;
     if (!$package_manager) {
-        $packages       = "N/A (no package manager was passed)"
+        $packages       = "N/A (no package manager was passed)";
     } elsif ($package_manager ne "portage") {
-        $packages       = "N/A (no supported package manager was passed)"
+        $packages       = "N/A (no supported package manager was passed)";
     } else {
         $packages       = get_packages $package_manager;
     }
