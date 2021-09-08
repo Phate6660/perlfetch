@@ -73,8 +73,7 @@ sub get_packages {
             $explicit_package_count = "N/A (could not read '/var/lib/portage/world')";
         }
         my @package_list = glob('/var/db/pkg/*/*');
-        # Package count needs one added.
-        my $total_package_count = $#package_list + 1;
+        my $total_package_count = @package_list;
         return $explicit_package_count . " (explicit) " . $total_package_count . " (total)";
     }
 }
