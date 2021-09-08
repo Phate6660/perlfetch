@@ -107,10 +107,10 @@ sub get_uptime {
 }
 
 sub get_info {
-    my $cpu             = get_cpu;
-    my $distro          = get_distro;
+    my $cpu             = get_cpu();
+    my $distro          = get_distro();
     my $editor          = get_var('EDITOR', "N/A (could not read \$EDITOR)");
-    my $environment     = get_de;
+    my $environment     = get_de();
     my $hostname        = get_line('/etc/hostname', 1);
     my $kernel          = get_line('/proc/sys/kernel/osrelease', 1);
     my $package_manager = $ARGV[0];
@@ -120,10 +120,10 @@ sub get_info {
     } elsif ($package_manager ne "portage") {
         $packages       = "N/A (no supported package manager was passed)";
     } else {
-        $packages       = get_packages $package_manager;
+        $packages       = get_packages($package_manager);
     }
     my $shell           = get_var('SHELL', "N/A (could not read \$SHELL)");
-    my $uptime          = get_uptime;
+    my $uptime          = get_uptime();
     my $user            = get_var('USER', "N/A (could not read \$USER)");
     return
         cpu         => $cpu,
@@ -138,7 +138,7 @@ sub get_info {
         user        => $user;
 }
 
-my %info = get_info;
+my %info = get_info();
 
 print << "EOF"
 CPU         = $info{cpu}
