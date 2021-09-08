@@ -4,9 +4,8 @@ use strict;
 
 # Read a file and return a specified line.
 sub get_line {
-    my $file = $_[0];
-    my $line_number = $_[1];
-    open my $info, $file or return "N/A (could not open $file)";
+    my ($file, $line_number) = @_;
+    open my $info, '<', $file or return "N/A (could not open $file)";
     my $line;
     while (my $line_from_file = <$info>) {
         $line = $line_from_file;
@@ -18,8 +17,7 @@ sub get_line {
 }
 
 sub get_var {
-    my $env_var = $_[0];
-    my $na_message = $_[1];
+    my ($env_var, $na_message) = @_;
     my $contents;
     if ($ENV{$env_var}) {
         $contents = $ENV{$env_var};
@@ -65,48 +63,35 @@ sub get_de {
 }
 
 sub get_packages {
-    my $package_manager = $_[0];
+    my ($package_manager) = @_;
     if ($package_manager eq "portage") {
-        open(FH, '/var/lib/portage/world');
         my $explicit_package_count;
-        if (<FH>) {
-            my $lines = 0;
-            while (<FH>) {
-                $lines++;
-            }
-            $explicit_package_count = $lines;
-            close(FH);
+        if (open my $FH, '<', '/var/lib/portage/world') {
+            () = <$FH>;
+            $explicit_package_count = $.;
         } else {
             $explicit_package_count = "N/A (could not read '/var/lib/portage/world')";
         }
-        my @package_list = glob('/var/db/pkg/*/*');
-        # Package count needs one added.
-        my $total_package_count = $#package_list + 1;
+        my @package_list = glob '/var/db/pkg/*/*';
+        my $total_package_count = @package_list;
         return $explicit_package_count . " (explicit) " . $total_package_count . " (total)";
     }
 }
 
 sub get_uptime {
     my $uptime_pre = get_line('/proc/uptime', 1);
-    my @uptime_list = split(/\./, $uptime_pre);
-    my $raw_uptime = $uptime_list[0];
+    my $raw_uptime = (split /\./, $uptime_pre)[0];
     my ($days, $hours, $minutes);
     if ($raw_uptime > 86400) {
         my $days_pre = $raw_uptime / 60 / 60 / 24;
-        if (index($days_pre, '.') != -1) {
-            my @days_pre_list = split(/\./, $days_pre);
-            $days_pre = $days_pre_list[0];
-        }
+        $days_pre = (split /\./, $days_pre)[0] if index($days_pre, '.') != -1;
         $days = $days_pre . "d";
     } else {
         $days = "";
     }
     if ($raw_uptime > 3600) {
         my $hours_pre = ($raw_uptime / 60 / 60) % 24;
-        if (index($hours_pre, '.') != -1) {
-            my @hours_pre_list = split(/\./, $hours_pre);
-            $hours_pre = $hours_pre_list[0];
-        }
+        $hours_pre = (split /\./, $hours_pre)[0] if index($hours_pre, '.') != -1;
         $hours = $hours_pre . "h";
     } else {
         $hours = "";
@@ -114,21 +99,18 @@ sub get_uptime {
     if ($raw_uptime > 60) {
         my $minutes_pre = ($raw_uptime / 60) % 60;
         $minutes = $minutes_pre . "m";
-        if (index($minutes_pre, '.') != -1) {
-            my @minutes_pre_list = split(/\./, $minutes_pre);
-            $minutes_pre = $minutes_pre_list[0];
-        }
+        $minutes_pre = (split /\./, $minutes_pre)[0] if index($minutes_pre, '.') != -1;
     } else {
         $minutes = "";
     }
-    return "$days $hours $minutes";
+    return join ' ', grep length, $days, $hours, $minutes;
 }
 
 sub get_info {
-    my $cpu             = get_cpu;
-    my $distro          = get_distro;
+    my $cpu             = get_cpu();
+    my $distro          = get_distro();
     my $editor          = get_var('EDITOR', "N/A (could not read \$EDITOR)");
-    my $environment     = get_de;
+    my $environment     = get_de();
     my $hostname        = get_line('/etc/hostname', 1);
     my $kernel          = get_line('/proc/sys/kernel/osrelease', 1);
     my $package_manager = $ARGV[0];
@@ -138,12 +120,12 @@ sub get_info {
     } elsif ($package_manager ne "portage") {
         $packages       = "N/A (no supported package manager was passed)";
     } else {
-        $packages       = get_packages $package_manager;
+        $packages       = get_packages($package_manager);
     }
     my $shell           = get_var('SHELL', "N/A (could not read \$SHELL)");
-    my $uptime          = get_uptime;
+    my $uptime          = get_uptime();
     my $user            = get_var('USER', "N/A (could not read \$USER)");
-    return (
+    return
         cpu         => $cpu,
         distro      => $distro,
         editor      => $editor,
@@ -153,11 +135,10 @@ sub get_info {
         packages    => $packages,
         shell       => $shell,
         uptime      => $uptime,
-        user        => $user
-        );
+        user        => $user;
 }
 
-my %info = get_info;
+my %info = get_info();
 
 print << "EOF"
 CPU         = $info{cpu}
