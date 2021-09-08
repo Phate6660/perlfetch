@@ -80,25 +80,18 @@ sub get_packages {
 
 sub get_uptime {
     my $uptime_pre = get_line('/proc/uptime', 1);
-    my @uptime_list = split(/\./, $uptime_pre);
-    my $raw_uptime = $uptime_list[0];
+    my $raw_uptime = (split /\./, $uptime_pre)[0];
     my ($days, $hours, $minutes);
     if ($raw_uptime > 86400) {
         my $days_pre = $raw_uptime / 60 / 60 / 24;
-        if (index($days_pre, '.') != -1) {
-            my @days_pre_list = split(/\./, $days_pre);
-            $days_pre = $days_pre_list[0];
-        }
+        $days_pre = (split /\./, $days_pre)[0] if index($days_pre, '.') != -1;
         $days = $days_pre . "d";
     } else {
         $days = "";
     }
     if ($raw_uptime > 3600) {
         my $hours_pre = ($raw_uptime / 60 / 60) % 24;
-        if (index($hours_pre, '.') != -1) {
-            my @hours_pre_list = split(/\./, $hours_pre);
-            $hours_pre = $hours_pre_list[0];
-        }
+        $hours_pre = (split /\./, $hours_pre)[0] if index($hours_pre, '.') != -1;
         $hours = $hours_pre . "h";
     } else {
         $hours = "";
@@ -106,10 +99,7 @@ sub get_uptime {
     if ($raw_uptime > 60) {
         my $minutes_pre = ($raw_uptime / 60) % 60;
         $minutes = $minutes_pre . "m";
-        if (index($minutes_pre, '.') != -1) {
-            my @minutes_pre_list = split(/\./, $minutes_pre);
-            $minutes_pre = $minutes_pre_list[0];
-        }
+        $minutes_pre = (split /\./, $minutes_pre)[0] if index($minutes_pre, '.') != -1;
     } else {
         $minutes = "";
     }
