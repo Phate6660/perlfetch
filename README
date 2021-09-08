@@ -1,12 +1,13 @@
 ### perlfetch ###
 
 Current output:
-$ ./perlfetch
+$ ./perlfetch portage
 CPU         = Intel(R) Core(TM) i5-3470 CPU @ 3.20GHz
 DISTRO      = Gentoo/Linux
 EDITOR      = /usr/bin/nvim
-ENVIRONMENT = GNOME
+ENVIRONMENT = KDE
 HOSTNAME    = gentoo
 KERNEL      = 5.10.61-gentoo-dist
+PACKAGES    = 47 (explicit) 1178 (total)
 SHELL       = /bin/bash
 USER        = valley
