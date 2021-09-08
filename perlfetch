@@ -5,7 +5,7 @@ use strict;
 # Read a file and return a specified line.
 sub get_line {
     my ($file, $line_number) = @_;
-    open my $info, $file or return "N/A (could not open $file)";
+    open my $info, '<', $file or return "N/A (could not open $file)";
     my $line;
     while (my $line_from_file = <$info>) {
         $line = $line_from_file;
