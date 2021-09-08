@@ -66,13 +66,18 @@ sub get_de {
 sub get_packages {
     my $package_manager = $_[0];
     if ($package_manager eq "portage") {
-        open(FH, '/var/lib/portage/world') or die "Could not open /var/lib/portage/world: $!";
-        my $lines = 0;
-        while (<FH>) {
-            $lines++;
+        open(FH, '/var/lib/portage/world');
+        my $explicit_package_count;
+        if (<FH>) {
+            my $lines = 0;
+            while (<FH>) {
+                $lines++;
+            }
+            $explicit_package_count = $lines;
+            close(FH);
+        } else {
+            $explicit_package_count = "N/A (could not read '/var/lib/portage/world')";
         }
-        close(FH);
-        my $explicit_package_count = $lines;
         my @package_list = glob('/var/db/pkg/*/*');
         # Package count needs one added.
         my $total_package_count = $#package_list + 1;
