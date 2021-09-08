@@ -114,7 +114,7 @@ sub get_uptime {
     } else {
         $minutes = "";
     }
-    return "$days $hours $minutes";
+    return join ' ', grep length, $days, $hours, $minutes;
 }
 
 sub get_info {
