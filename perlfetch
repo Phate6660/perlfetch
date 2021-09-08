@@ -72,7 +72,7 @@ sub get_packages {
         } else {
             $explicit_package_count = "N/A (could not read '/var/lib/portage/world')";
         }
-        my @package_list = glob('/var/db/pkg/*/*');
+        my @package_list = glob '/var/db/pkg/*/*';
         my $total_package_count = @package_list;
         return $explicit_package_count . " (explicit) " . $total_package_count . " (total)";
     }
@@ -125,7 +125,7 @@ sub get_info {
     my $shell           = get_var('SHELL', "N/A (could not read \$SHELL)");
     my $uptime          = get_uptime;
     my $user            = get_var('USER', "N/A (could not read \$USER)");
-    return (
+    return
         cpu         => $cpu,
         distro      => $distro,
         editor      => $editor,
@@ -135,8 +135,7 @@ sub get_info {
         packages    => $packages,
         shell       => $shell,
         uptime      => $uptime,
-        user        => $user
-        );
+        user        => $user;
 }
 
 my %info = get_info;
