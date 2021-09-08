@@ -4,8 +4,7 @@ use strict;
 
 # Read a file and return a specified line.
 sub get_line {
-    my $file = $_[0];
-    my $line_number = $_[1];
+    my ($file, $line_number) = @_;
     open my $info, $file or return "N/A (could not open $file)";
     my $line;
     while (my $line_from_file = <$info>) {
@@ -18,8 +17,7 @@ sub get_line {
 }
 
 sub get_var {
-    my $env_var = $_[0];
-    my $na_message = $_[1];
+    my ($env_var, $na_message) = @_;
     my $contents;
     if ($ENV{$env_var}) {
         $contents = $ENV{$env_var};
@@ -65,7 +63,7 @@ sub get_de {
 }
 
 sub get_packages {
-    my $package_manager = $_[0];
+    my ($package_manager) = @_;
     if ($package_manager eq "portage") {
         open(FH, '/var/lib/portage/world');
         my $explicit_package_count;
