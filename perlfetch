@@ -85,6 +85,44 @@ sub get_packages {
     }
 }
 
+sub get_uptime {
+    my $uptime_pre = get_line('/proc/uptime', 1);
+    my @uptime_list = split(/\./, $uptime_pre);
+    my $raw_uptime = $uptime_list[0];
+    my ($days, $hours, $minutes);
+    if ($raw_uptime > 86400) {
+        my $days_pre = $raw_uptime / 60 / 60 / 24;
+        if (index($days_pre, '.') != -1) {
+            my @days_pre_list = split(/\./, $days_pre);
+            $days_pre = $days_pre_list[0];
+        }
+        $days = $days_pre . "d";
+    } else {
+        $days = "";
+    }
+    if ($raw_uptime > 3600) {
+        my $hours_pre = ($raw_uptime / 60 / 60) % 24;
+        if (index($hours_pre, '.') != -1) {
+            my @hours_pre_list = split(/\./, $hours_pre);
+            $hours_pre = $hours_pre_list[0];
+        }
+        $hours = $hours_pre . "h";
+    } else {
+        $hours = "";
+    }
+    if ($raw_uptime > 60) {
+        my $minutes_pre = ($raw_uptime / 60) % 60;
+        $minutes = $minutes_pre . "m";
+        if (index($minutes_pre, '.') != -1) {
+            my @minutes_pre_list = split(/\./, $minutes_pre);
+            $minutes_pre = $minutes_pre_list[0];
+        }
+    } else {
+        $minutes = "";
+    }
+    return "$days $hours $minutes";
+}
+
 sub get_info {
     my $cpu             = get_cpu;
     my $distro          = get_distro;
@@ -102,6 +140,7 @@ sub get_info {
         $packages       = get_packages $package_manager;
     }
     my $shell           = get_var('SHELL', "N/A (could not read \$SHELL)");
+    my $uptime          = get_uptime;
     my $user            = get_var('USER', "N/A (could not read \$USER)");
     return (
         cpu         => $cpu,
@@ -112,6 +151,7 @@ sub get_info {
         kernel      => $kernel,
         packages    => $packages,
         shell       => $shell,
+        uptime      => $uptime,
         user        => $user
         );
 }
@@ -134,6 +174,8 @@ format OUTPUT =
 "PACKAGES    = " . $info{packages}
 ^*
 "SHELL       = " . $info{shell}
+^*
+"UPTIME      = " . $info{uptime}
 ^*
 "USER        = " . $info{user}
 .

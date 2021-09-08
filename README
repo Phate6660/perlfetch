@@ -10,4 +10,5 @@ HOSTNAME    = gentoo
 KERNEL      = 5.10.61-gentoo-dist
 PACKAGES    = 47 (explicit) 1178 (total)
 SHELL       = /bin/bash
+UPTIME      = 3d 11h 48m
 USER        = valley
