@@ -30,7 +30,7 @@ sub get_var {
 sub get_cpu {
     my $cpu_line = get_line('/proc/cpuinfo', 5);
     my @cpu_list = split(/:/, $cpu_line);
-    my $cpu = $cpu_list[1];
+    my $cpu      = $cpu_list[1];
     $cpu =~ s/^.//;
     return $cpu;
 }
@@ -38,7 +38,7 @@ sub get_cpu {
 sub get_distro {
     my $dist_line = get_line('/etc/os-release', 3);
     my @dist_list = split(/=/, $dist_line);
-    my $dist = $dist_list[1];
+    my $dist      = $dist_list[1];
     $dist =~ s/"//g;
     return $dist;
 }
@@ -62,6 +62,26 @@ sub get_de {
     }
 }
 
+sub get_music {
+    my ($music_player) = @_;
+    if ($music_player eq "spotify" or $music_player eq "rhythmbox") {
+        open my $cmd, '-|', 'playerctl metadata -f "{{artist}} - {{title}}"' 
+            or return "N/A (could not run playerctl)";
+        while (my $output = <$cmd>) {
+            $output =~ s/\n//g;
+            return $output;
+        }
+    } elsif ($music_player eq "mpd") {
+        open my $cmd, '-|', 'mpc current | head -n1' or return "N/A (could not run mpc)";
+        while (my $output = <$cmd>) {
+            $output =~ s/\n//g;
+            return $output;
+        }
+    } else {
+        return "N/A (did not pass a supported player)";
+    }
+}
+
 sub get_packages {
     my ($package_manager) = @_;
     if ($package_manager eq "portage") {
@@ -72,7 +92,7 @@ sub get_packages {
         } else {
             $explicit_package_count = "N/A (could not read '/var/lib/portage/world')";
         }
-        my @package_list = glob '/var/db/pkg/*/*';
+        my @package_list        = glob '/var/db/pkg/*/*';
         my $total_package_count = @package_list;
         return $explicit_package_count . " (explicit) " . $total_package_count . " (total)";
     }
@@ -85,20 +105,20 @@ sub get_uptime {
     if ($raw_uptime > 86400) {
         my $days_pre = $raw_uptime / 60 / 60 / 24;
         $days_pre = (split /\./, $days_pre)[0] if index($days_pre, '.') != -1;
-        $days = $days_pre . "d";
+        $days     = $days_pre . "d";
     } else {
         $days = "";
     }
     if ($raw_uptime > 3600) {
         my $hours_pre = ($raw_uptime / 60 / 60) % 24;
         $hours_pre = (split /\./, $hours_pre)[0] if index($hours_pre, '.') != -1;
-        $hours = $hours_pre . "h";
+        $hours     = $hours_pre . "h";
     } else {
         $hours = "";
     }
     if ($raw_uptime > 60) {
         my $minutes_pre = ($raw_uptime / 60) % 60;
-        $minutes = $minutes_pre . "m";
+        $minutes     = $minutes_pre . "m";
         $minutes_pre = (split /\./, $minutes_pre)[0] if index($minutes_pre, '.') != -1;
     } else {
         $minutes = "";
@@ -111,27 +131,35 @@ sub get_info {
     my $distro          = get_distro();
     my $editor          = get_var('EDITOR', "N/A (could not read \$EDITOR)");
     my $environment     = get_de();
-    my $hostname        = get_line('/etc/hostname', 1);
+    my $hostname        = get_line('/etc/hostname',              1);
     my $kernel          = get_line('/proc/sys/kernel/osrelease', 1);
     my $package_manager = $ARGV[0];
     my $packages;
     if (!$package_manager) {
-        $packages       = "N/A (no package manager was passed)";
+        $packages = "N/A (no package manager was passed)";
     } elsif ($package_manager ne "portage") {
-        $packages       = "N/A (no supported package manager was passed)";
+        $packages = "N/A (no supported package manager was passed)";
     } else {
-        $packages       = get_packages($package_manager);
+        $packages = get_packages($package_manager);
     }
-    my $shell           = get_var('SHELL', "N/A (could not read \$SHELL)");
-    my $uptime          = get_uptime();
-    my $user            = get_var('USER', "N/A (could not read \$USER)");
-    return
+    my $music_player = $ARGV[1];
+    my $music;
+    if (!$music_player) {
+        $music = get_music("N/A");
+    } else {
+        $music = get_music($music_player);
+    }
+    my $shell  = get_var('SHELL', "N/A (could not read \$SHELL)");
+    my $uptime = get_uptime();
+    my $user   = get_var('USER', "N/A (could not read \$USER)");
+    return 
         cpu         => $cpu,
         distro      => $distro,
         editor      => $editor,
         environment => $environment,
         hostname    => $hostname,
         kernel      => $kernel,
+        music       => $music,
         packages    => $packages,
         shell       => $shell,
         uptime      => $uptime,
@@ -151,4 +179,5 @@ PACKAGES    = $info{packages}
 SHELL       = $info{shell}
 UPTIME      = $info{uptime}
 USER        = $info{user}
+MUSIC       = $info{music}
 EOF
